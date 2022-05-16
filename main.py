@@ -1,4 +1,5 @@
 import datetime
+import json
 import time
 from data import *
 import requests
@@ -39,9 +40,24 @@ def get_coin_price():
     r = requests.post(f"https://ton-swap-indexer.broxus.com/v1/currencies/{final_coin_address}")
 
     main_price = r.json()
-    time.sleep(30)
-    print(float(main_price["price"]))
-    return float(main_price["price"])
+    # time.sleep(15)
+
+    actual_price_info = main_price['price']
+    actual_price_change = main_price['priceChange']
+    actual_volume = main_price["volume24h"]
+    actual_volume = toFixed(float(actual_volume), 0)
+    actual_price_info = toFixed(float(actual_price_info), 3)
+
+    dt = datetime.datetime.now()
+    dt_string = dt.strftime("Время: %H:%M:%S ")
+
+    info_result = f"{dt_string}| DAI = {actual_price_info} $ | Price Change: {actual_price_change} | Volume24: {actual_volume} $\n"
+    print(info_result)
+
+    with open("data.txt", "a") as f:
+        f.write(info_result)
+
+    return actual_price_info
 
 
 def toFixed(numObj, digits=0):
