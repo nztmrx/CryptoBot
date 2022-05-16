@@ -40,7 +40,7 @@ def get_coin_price():
     r = requests.post(f"https://ton-swap-indexer.broxus.com/v1/currencies/{final_coin_address}")
 
     main_price = r.json()
-    # time.sleep(15)
+    time.sleep(15)
 
     actual_price_info = main_price['price']
     actual_price_change = main_price['priceChange']
