@@ -3,18 +3,17 @@ import json
 import time
 from data import *
 import requests
-import threading
 
 token = tg_api_token
 
+coin_address = {
+    "DAI": f"{DAI_ADDRESS}",
+    "WEVER": f"{WEVER_ADDRESS}",
+    "USD": f"{USD_ADDRESS}"
+}
+
 
 def coin_addresses(coin_name):
-    coin_address = {
-        "DAI": "0:eb2ccad2020d9af9cec137d3146dde067039965c13a27d97293c931dae22b2b9",
-        "WEVER": "0:a49cd4e158a9a15555e624759e2e4e766d22600b7800d891e46f9291f044a93d",
-        "USD": "0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2"
-    }
-
     if coin_name == "DAI":
         return coin_address["DAI"]
     elif coin_name == "WEVER":
@@ -26,7 +25,7 @@ def coin_addresses(coin_name):
 def get_coin_price_on_name(coin_name):
     final_coin_address = coin_addresses(coin_name)
 
-    r = requests.post(f"https://ton-swap-indexer.broxus.com/v1/currencies/{final_coin_address}")
+    r = requests.post(f"{url_to_api_fq}{final_coin_address}")
 
     main_price = r.json()
     print(toFixed(main_price["price"], 4), main_price["currency"])
@@ -37,10 +36,10 @@ def get_coin_price_on_name(coin_name):
 def get_coin_price():
     final_coin_address = coin_addresses("DAI")
 
-    r = requests.post(f"https://ton-swap-indexer.broxus.com/v1/currencies/{final_coin_address}")
+    r = requests.post(f"{url_to_api_fq}{final_coin_address}")
 
     main_price = r.json()
-    # time.sleep(15)
+    time.sleep(15)
 
     actual_price_info = main_price['price']
     actual_price_change = main_price['priceChange']
@@ -62,29 +61,6 @@ def get_coin_price():
 
 def toFixed(numObj, digits=0):
     return f"{numObj:.{digits}f}"
-
-
-# def return_actual_price_per_hour():
-#     actual_price = get_coin_price()
-#     actual_price = toFixed(float(actual_price), 3)
-#
-#     dt = datetime.datetime.now()
-#     dt_string = dt.strftime("Время: %H:%M:%S ")
-#
-#     text = f"""
-#             📈Часовое обновление цен:
-#             -----------------------------------
-#             {dt_string}
-#             -----------------------------------
-#             Dai Stable-coin  - {actual_price} $
-#             -----------------------------------
-#             USD Stable-coin -
-#             -------------------------
-#
-#             -------------------------
-#            """
-#
-#     requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
 
 
 def compare_prices(target_procent):
