@@ -40,7 +40,7 @@ def get_coin_price():
     r = requests.post(f"https://ton-swap-indexer.broxus.com/v1/currencies/{final_coin_address}")
 
     main_price = r.json()
-    time.sleep(15)
+    # time.sleep(15)
 
     actual_price_info = main_price['price']
     actual_price_change = main_price['priceChange']
@@ -89,25 +89,28 @@ def toFixed(numObj, digits=0):
 
 def compare_prices(target_procent):
     DAI_default_price = 1
-    target_price_up = (DAI_default_price * target_procent) / 100 + DAI_default_price
-    target_price_down = DAI_default_price - ((DAI_default_price * target_procent) / 100)
+    # target_price_up = (DAI_default_price * target_procent) / 100 + DAI_default_price
+    # target_price_down = DAI_default_price - ((DAI_default_price * target_procent) / 100)
+    target_price_up = 1.015
+    target_price_down = 0.985
 
     while True:
 
         actual_price = get_coin_price()
-        actual_price = toFixed(float(actual_price), 2)
+        actual_price = toFixed(float(actual_price), 4)
+        print(actual_price)
 
         dt = datetime.datetime.now()
         dt_string = dt.strftime("Время: %H:%M:%S ")
 
-        text_up = f'‼️‼️📈РОСТ📈️‼️‼️\n' \
+        text_up = f'‼️‼️📈ПРОДАВАТЬ📈️‼️‼️\n' \
                   f'DAI price - {actual_price} $\n' \
                   f'{dt_string}\n' \
                   f'Target price - {target_price_up} $\n' \
                   f'Target procent - up/down {target_procent} %\n' \
                   f'https://app.flatqube.io/swap/0:eb2ccad2020d9af9cec137d3146dde067039965c13a27d97293c931dae22b2b9/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2'
 
-        text_down = '‼️‼️️📉DOWN📉️‼️‼️\n' \
+        text_down = '‼️‼️️📉ПОКУПАТЬ📉️‼️‼️\n' \
                     f'DAI price - {actual_price} $\n' \
                     f'{dt_string}\n' \
                     f'Target price - {target_price_down} $\n' \
@@ -116,15 +119,15 @@ def compare_prices(target_procent):
 
         if float(actual_price) == target_price_up or float(actual_price) > target_price_up:
             requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text_up}")
-            time.sleep(600)
+            time.sleep(300)
 
         elif float(actual_price) == target_price_down or float(actual_price) < target_price_down:
             requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text_down}")
-            time.sleep(600)
+            time.sleep(300)
 
 
 def main():
-    compare_prices(3)
+    compare_prices(1.5)
 
 
 if __name__ == "__main__":
