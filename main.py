@@ -53,8 +53,8 @@ def get_coin_price():
     info_result = f"{dt_string}| DAI = {actual_price_info} $ | Price Change: {actual_price_change} | Volume24: {actual_volume} $\n"
     print(info_result)
 
-    with open("data.txt", "a") as f:
-        f.write(info_result)
+    # with open("data.txt", "a") as f:
+    #     f.write(info_result)
 
     return actual_price_info
 
