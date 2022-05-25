@@ -134,6 +134,10 @@ def compare_prices():
                 send_message(result_items)
                 continue
 
+    dt = datetime.datetime.now()
+    dt_string = dt.strftime("Время: %H:%M:%S ")
+
+    print(dt_string)
     time.sleep(30)
 
 
