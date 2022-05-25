@@ -92,7 +92,7 @@ def get_price_on_flat_qube(coin_name):
 
 def compare_prices():
     address_list = get_coins_address()
-    target_procent = 1
+    target_procent = 4
 
     for items in address_list:
         b_items = get_price_on_binance(items)
