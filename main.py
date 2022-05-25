@@ -90,53 +90,116 @@ def get_price_on_flat_qube(coin_name):
     return result
 
 
-# def send_message():
-
 def compare_prices():
     address_list = get_coins_address()
-    target_procent = 4
+    target_procent = 1
 
     for items in address_list:
-        # b_items = get_price_on_binance(items)
-        # fq_items = get_price_on_flat_qube(items)
-        b_items = "DAI"
-        b_price = 1
-        b_price = float(b_price)
-        fq_price = 1.05
+        b_items = get_price_on_binance(items)
+        fq_items = get_price_on_flat_qube(items)
 
-        # b_price = float(b_items['price'])
-        # fq_price = float(fq_items['price'])
+        b_price = float(b_items['price'])
+        fq_price = float(fq_items['price'])
+        print(f"Binance: {b_items['name']}: {b_price} $$$\n"
+              f"FlatQube: {fq_items['name']}: {fq_price} $$$")
+        print()
+
         result = 0
         if float(b_price) > float(fq_price):
             result = (b_price / fq_price - 1) * 100
-            result = result
             if result > target_procent:
                 result_items = {
-                    "marker": "Binance",
-                    # "name": b_items["name"],
-                    "name": b_items,
-                    "price": b_price,
+                    "market": "Binance",
+                    "name": b_items["name"],
+                    "b_price": b_price,
+                    "fq_price": fq_price,
                     "procent": target_procent,
-                    "different %": result
+                    "target_procent": target_procent,
+                    "different": f"{int(result)}%"
                 }
-                return result_items
+                send_message(result_items)
+                continue
 
         elif float(fq_price) > float(b_price):
             result = (fq_price / b_price - 1) * 100
-            result = result
             if result > target_procent:
                 result_items = {
-                    "market": "FlatQube",
-                    # "name": b_items["name"],
-                    "name": b_items,
-                    "price": b_price,
-                    "procent": target_procent,
-                    "different %": result
+                    "market": "FlatQube.io",
+                    "name": b_items["name"],
+                    "b_price": b_price,
+                    "fq_price": fq_price,
+                    "target_procent": target_procent,
+                    "different": f"{int(result)}%"
                 }
-                return result_items
+                send_message(result_items)
+                continue
 
-        # if b_price > fq_price:
-        # pass
+    time.sleep(30)
+
+
+def send_message(items):
+    dt = datetime.datetime.now()
+    dt_string = dt.strftime("Время: %H:%M:%S ")
+
+    if items["market"] == "FlatQube":
+        coin_name = items["name"]
+        market_name = items["market"]
+        b_price = items["b_price"]
+        fq_price = items["fq_price"]
+        target_procent = items["target_procent"]
+
+        link = None
+
+        if coin_name == "DAI":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:eb2ccad2020d9af9cec137d3146dde067039965c13a27d97293c931dae22b2b9"
+        elif coin_name == "WBTC":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:2ba32b75870d572e255809b7b423f30f36dd5dea075bd5f026863fceb81f2bcf"
+        elif coin_name == "WETH":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:59b6b64ac6798aacf385ae9910008a525a84fc6dcf9f942ae81f8e8485fe160d"
+        elif coin_name == "ADA":
+            link = "https://app.dexada.io/swap/0:152a7c50f7df2f305b56a1dd7e254d84a5aed018ba44b920f28def735215baa1/coin"
+
+        if coin_name == "ADA":
+            market_name = "Dexada.io"
+        text = f"""‼️Покупать {coin_name} на {market_name}‼️️
+Разница в цене на монету: {coin_name} на маркете - {market_name} составляет {items["different"]}, таргет процент - {target_procent}%
+{market_name}: {coin_name} - {fq_price} $
+Binance: {coin_name} - {b_price} $
+Разница = {toFixed((fq_price - b_price), 5)} $
+{dt_string}
+{link}
+        """
+        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
+
+    elif items["market"] == "Binance":
+        coin_name = items["name"]
+        market_name = items["market"]
+        b_price = items["b_price"]
+        fq_price = items["fq_price"]
+        target_procent = items["target_procent"]
+
+        link = None
+
+        if coin_name == "DAI":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:eb2ccad2020d9af9cec137d3146dde067039965c13a27d97293c931dae22b2b9"
+        elif coin_name == "WBTC":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:2ba32b75870d572e255809b7b423f30f36dd5dea075bd5f026863fceb81f2bcf"
+        elif coin_name == "WETH":
+            link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:59b6b64ac6798aacf385ae9910008a525a84fc6dcf9f942ae81f8e8485fe160d"
+        elif coin_name == "ADA":
+            link = "https://app.dexada.io/swap/0:152a7c50f7df2f305b56a1dd7e254d84a5aed018ba44b920f28def735215baa1/coin"
+
+        if coin_name == "ADA":
+            market_name = "Dexada.io"
+        text = f"""‼️Покупать {coin_name} на {market_name}‼️️
+Разница в цене на монету: {coin_name} на маркете - {market_name} составляет {items["different"]}, таргет процент - {target_procent}%
+{market_name}: {coin_name} - {fq_price} $
+FlatQube.io: {coin_name} - {b_price} $
+Разница = {toFixed((fq_price - b_price), 5)} $
+{dt_string}
+{link}
+                """
+        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
 
 
 # def get_coin_price_on_name(coin_name):
@@ -223,7 +286,8 @@ def compare_prices():
 
 
 def main():
-    print(compare_prices())
+    while True:
+        compare_prices()
 
 
 if __name__ == "__main__":
