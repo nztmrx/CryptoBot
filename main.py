@@ -137,7 +137,7 @@ def compare_prices():
     dt = datetime.datetime.now()
     dt_string = dt.strftime("Время: %H:%M:%S ")
 
-    print(dt_string)
+    print(dt_string, target_procent %)
     time.sleep(30)
 
 
