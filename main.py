@@ -107,6 +107,7 @@ def compare_prices():
             print()
             b_price = float(b_items['price'])
             fq_price = float(fq_items['price'])
+
             print(f"Binance: {b_items['name']}: {b_price} $$$\n"
                   f"FlatQube: {fq_items['name']}: {fq_price} $$$")
             if b_price > fq_price:
@@ -193,7 +194,7 @@ Binance: {coin_name} - {b_price} $
 {link}
         """
 
-        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
+        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@ssss1111wwww&text={text}")
 
     elif items["market"] == "Binance":
         coin_name = items["name"]
@@ -222,7 +223,7 @@ FlatQube.io: {coin_name} - {b_price} $
 {link}
                 """
 
-        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
+        requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@ssss1111wwww&text={text}")
 
 
 # def get_coin_price_on_name(coin_name):
