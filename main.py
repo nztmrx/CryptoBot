@@ -22,130 +22,149 @@ def get_coins_address():
 
 
 def get_price_on_binance(coin_name):
-    compare_value = "USDT"
+    try:
+        compare_value = "USDT"
 
-    if coin_name == "WBTC":
-        coin_name = "BTC"
+        if coin_name == "WBTC":
+            coin_name = "BTC"
 
-    if coin_name == "WETH":
-        coin_name = "ETH"
+        if coin_name == "WETH":
+            coin_name = "ETH"
 
-    payload = {"symbol": f"{coin_name}{compare_value}"}
-    r = requests.get(url_binance_api, payload)
-    status_code = r
+        payload = {"symbol": f"{coin_name}{compare_value}"}
+        r = requests.get(url_binance_api, payload)
+        status_code = r
 
-    if coin_name == "BTC":
-        coin_name = "WBTC"
+        if coin_name == "BTC":
+            coin_name = "WBTC"
 
-    if coin_name == "ETH":
-        coin_name = "WETH"
+        if coin_name == "ETH":
+            coin_name = "WETH"
 
-    response = r.json()
-    if r:
-        pass
-    else:
-        raise Exception(f"Something went wrong, {status_code}")
+        response = r.json()
+        if r:
+            pass
+        else:
+            raise Exception(f"Something went wrong, {status_code}")
 
-    final_price = response['price']
-    final_price = toFixed(final_price, 5)
+        final_price = response['price']
+        final_price = toFixed(final_price, 5)
 
-    #   Удаление последней точки
-    if final_price.endswith('.'):
-        final_price = final_price[:-1]
+        #   Удаление последней точки
+        if final_price.endswith('.'):
+            final_price = final_price[:-1]
 
-    result = {
-        "name": coin_name,
-        "price": final_price.strip()
-    }
+        result = {
+            "name": coin_name,
+            "price": final_price.strip()
+        }
+        return result
 
-    return result
+    except ConnectionError as e:
+        print(e)
 
 
 def get_price_on_flat_qube(coin_name):
-    coin_list = get_coins_address()
-    coin_address = coin_list[coin_name]
+    try:
+        coin_list = get_coins_address()
+        coin_address = coin_list[coin_name]
 
-    r = requests.post(f"{url_flat_qube_api}{coin_address}")
-    status_code = r
-    response = r.json()
+        r = requests.post(f"{url_flat_qube_api}{coin_address}")
+        status_code = r
+        response = r.json()
 
-    if r:
-        pass
-    else:
-        raise Exception(f"Wrong coin name, {status_code}")
+        if r:
+            pass
+        else:
+            raise Exception(f"Wrong coin name, {status_code}")
 
-    final_price = response['price']
+        final_price = response['price']
 
-    final_price = toFixed(final_price, 5)
+        final_price = toFixed(final_price, 5)
 
-    #   Удаление последней точки
-    if final_price.endswith('.'):
-        final_price = final_price[:-1]
+        #   Удаление последней точки
+        if final_price.endswith('.'):
+            final_price = final_price[:-1]
 
-    result = {
-        "name": coin_name,
-        "price": final_price.strip()
-    }
+        result = {
+            "name": coin_name,
+            "price": final_price.strip()
+        }
 
-    return result
+        return result
+    except ConnectionError as e:
+        print(e)
 
 
 def compare_prices():
-    address_list = get_coins_address()
-    target_procent = 4
+    try:
+        address_list = get_coins_address()
+        target_procent = 4
 
-    for items in address_list:
-        b_items = get_price_on_binance(items)
-        fq_items = get_price_on_flat_qube(items)
+        for items in address_list:
+            b_items = get_price_on_binance(items)
+            fq_items = get_price_on_flat_qube(items)
 
-        b_price = float(b_items['price'])
-        fq_price = float(fq_items['price'])
-        print(f"Binance: {b_items['name']}: {b_price} $$$\n"
-              f"FlatQube: {fq_items['name']}: {fq_price} $$$")
-        print()
+            print()
+            b_price = float(b_items['price'])
+            fq_price = float(fq_items['price'])
+            print(f"Binance: {b_items['name']}: {b_price} $$$\n"
+                  f"FlatQube: {fq_items['name']}: {fq_price} $$$")
+            if b_price > fq_price:
+                print(f"Разница = {toFixed((b_price - fq_price), 5)} $")
+                result = ( b_price / fq_price - 1) * 100
+                print(f"Разница в процентах = {toFixed(result, 2)}%")
 
-        result = 0
-        if float(b_price) > float(fq_price):
-            result = (b_price / fq_price - 1) * 100
-            if result > target_procent:
-                result_items = {
-                    "market": "Binance",
-                    "name": b_items["name"],
-                    "b_price": b_price,
-                    "fq_price": fq_price,
-                    "procent": target_procent,
-                    "target_procent": target_procent,
-                    "different": f"{int(result)}%"
-                }
-                send_message(result_items)
+            elif fq_price > b_price:
+                print(f"Разница = {toFixed((fq_price - b_price), 5)} $")
+                result = (fq_price / b_price - 1) * 100
+                print(f"Разница в процентах = {toFixed(result, 2)}%")
+            print()
+
+            result = 0
+            if float(b_price) > float(fq_price):
+                result = (b_price / fq_price - 1) * 100
+                if result > target_procent:
+                    result_items = {
+                        "market": "Binance",
+                        "name": b_items["name"],
+                        "b_price": b_price,
+                        "fq_price": fq_price,
+                        "procent": target_procent,
+                        "target_procent": target_procent,
+                        "different": f"{int(result)}%"
+                    }
+                    send_message(result_items)
                 continue
 
-        elif float(fq_price) > float(b_price):
-            result = (fq_price / b_price - 1) * 100
-            if result > target_procent:
-                result_items = {
-                    "market": "FlatQube.io",
-                    "name": b_items["name"],
-                    "b_price": b_price,
-                    "fq_price": fq_price,
-                    "target_procent": target_procent,
-                    "different": f"{int(result)}%"
-                }
-                send_message(result_items)
+            elif float(fq_price) > float(b_price):
+                result = (fq_price / b_price - 1) * 100
+                if result > target_procent:
+                    result_items = {
+                        "market": "FlatQube.io",
+                        "name": b_items["name"],
+                        "b_price": b_price,
+                        "fq_price": fq_price,
+                        "target_procent": target_procent,
+                        "different": f"{int(result)}%"
+                    }
+                    send_message(result_items)
                 continue
 
-    dt = datetime.datetime.now()
-    dt_string = dt.strftime("Время: %H:%M:%S")
+        dt = datetime.datetime.now()
+        dt_string = dt.strftime("Время: %H:%M:%S")
 
-    print(f"{dt_string}, TargetProcent: {target_procent}%")
-    time.sleep(30)
+        print(f"{dt_string}, TargetProcent: {target_procent}%")
+        time.sleep(30)
+    except ConnectionError as e:
+        print(e)
 
 
 def send_message(items):
     dt = datetime.datetime.now()
     dt_string = dt.strftime("Время: %H:%M:%S ")
 
-    if items["market"] == "FlatQube":
+    if items["market"] == "FlatQube.io":
         coin_name = items["name"]
         market_name = items["market"]
         b_price = items["b_price"]
@@ -165,6 +184,7 @@ def send_message(items):
 
         if coin_name == "ADA":
             market_name = "Dexada.io"
+
         text = f"""‼️Покупать {coin_name} на {market_name}‼️️
 Разница в цене на монету: {coin_name} на маркете - {market_name} составляет {items["different"]}, таргет процент - {target_procent}%
 {market_name}: {coin_name} - {fq_price} $
@@ -173,6 +193,7 @@ Binance: {coin_name} - {b_price} $
 {dt_string}
 {link}
         """
+
         requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
 
     elif items["market"] == "Binance":
@@ -203,6 +224,7 @@ FlatQube.io: {coin_name} - {b_price} $
 {dt_string}
 {link}
                 """
+
         requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
 
 
