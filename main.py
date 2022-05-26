@@ -15,7 +15,6 @@ def get_coins_address():
         "DAI": f"{DAI_ADDRESS}",
         "WBTC": f"{WBTC_ADDRESS}",
         "WETH": f"{WETH_ADDRESS}",
-        "ADA": f"{ADA_ADDRESS}"
     }
 
     return coin_address
@@ -211,8 +210,6 @@ Binance: {coin_name} - {b_price} $
             link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:2ba32b75870d572e255809b7b423f30f36dd5dea075bd5f026863fceb81f2bcf"
         elif coin_name == "WETH":
             link = "https://app.flatqube.io/swap/0:a519f99bb5d6d51ef958ed24d337ad75a1c770885dcd42d51d6663f9fcdacfb2/0:59b6b64ac6798aacf385ae9910008a525a84fc6dcf9f942ae81f8e8485fe160d"
-        elif coin_name == "ADA":
-            link = "https://app.dexada.io/swap/0:152a7c50f7df2f305b56a1dd7e254d84a5aed018ba44b920f28def735215baa1/coin"
 
         if coin_name == "ADA":
             market_name = "Dexada.io"
