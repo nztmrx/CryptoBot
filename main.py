@@ -1,5 +1,7 @@
 import datetime
 import time
+
+import data
 from data import *
 import requests
 import logging
@@ -103,12 +105,11 @@ def get_price_on_flat_qube(coin_name):
 def compare_prices():
     try:
         address_list = get_coins_address()
-        target_procent = 4
-
+        # target_procent = target_procent
+        target_procent = 3.7
         for items in address_list:
             b_items = get_price_on_binance(items)
             fq_items = get_price_on_flat_qube(items)
-
             print()
             b_price = float(b_items['price'])
             fq_price = float(fq_items['price'])
@@ -116,18 +117,27 @@ def compare_prices():
                   f"FlatQube: {fq_items['name']}: {fq_price} $$$")
             if b_price > fq_price:
                 print(f"Разница = {toFixed((b_price - fq_price), 5)} $")
-                result = ( b_price / fq_price - 1) * 100
+                try:
+                    result = (b_price / fq_price - 1) * 100
+                except ZeroDivisionError:
+                    continue
                 print(f"Разница в процентах = {toFixed(result, 2)}%")
 
             elif fq_price > b_price:
                 print(f"Разница = {toFixed((fq_price - b_price), 5)} $")
-                result = (fq_price / b_price - 1) * 100
+                try:
+                    result = (fq_price / b_price - 1) * 100
+                except ZeroDivisionError:
+                    continue
                 print(f"Разница в процентах = {toFixed(result, 2)}%")
             print()
 
             result = 0
             if float(b_price) > float(fq_price):
-                result = (b_price / fq_price - 1) * 100
+                try:
+                    result = (b_price / fq_price - 1) * 100
+                except ZeroDivisionError:
+                    continue
                 if result > target_procent:
                     result_items = {
                         "market": "Binance",
@@ -136,13 +146,16 @@ def compare_prices():
                         "fq_price": fq_price,
                         "procent": target_procent,
                         "target_procent": target_procent,
-                        "different": f"{int(result)}%"
+                        "different": f"{round(result, 2)}%"
                     }
                     send_message(result_items)
                 continue
 
             elif float(fq_price) > float(b_price):
-                result = (fq_price / b_price - 1) * 100
+                try:
+                    result = (fq_price / b_price - 1) * 100
+                except ZeroDivisionError:
+                    continue
                 if result > target_procent:
                     result_items = {
                         "market": "FlatQube.io",
@@ -150,7 +163,7 @@ def compare_prices():
                         "b_price": b_price,
                         "fq_price": fq_price,
                         "target_procent": target_procent,
-                        "different": f"{int(result)}%"
+                        "different": f"{round(result, 2)}%"
                     }
                     send_message(result_items)
                 continue
@@ -232,11 +245,20 @@ Binance: {coin_name} - {b_price} $
         requests.get(f"https://api.telegram.org/bot{tg_api_token}/sendMessage?chat_id=@dai_c0in&text={text}")
 
 
+def check_sub(user_id):
+    print(data.user_list)
+    print(user_id)
+    if str(user_id) in data.user_list:
+        access = True
+    else:
+        access = False
+    return access
+
 
 def main():
-    while True:
-        compare_prices()
-
+    compare_prices()
+    # print(check_sub('785023632'))
+    pass
 
 if __name__ == "__main__":
     main()
