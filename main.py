@@ -256,8 +256,9 @@ def check_sub(user_id):
 
 
 def main():
-    compare_prices()
-    # print(check_sub('785023632'))
+    while True:
+        compare_prices()
+    # print(check_sub('785023632')
     pass
 
 if __name__ == "__main__":
