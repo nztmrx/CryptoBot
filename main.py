@@ -17,7 +17,6 @@ def toFixed(numObj, digits=0):
 
 def get_coins_address():
     coin_address = {
-        "DAI": f"{DAI_ADDRESS}",
         "WBTC": f"{WBTC_ADDRESS}",
         "WETH": f"{WETH_ADDRESS}",
         "ADA": f"{ADA_ADDRESS}"
@@ -106,7 +105,7 @@ def compare_prices():
     try:
         address_list = get_coins_address()
         # target_procent = target_procent
-        target_procent = 3.7
+        target_procent = 3
         for items in address_list:
             b_items = get_price_on_binance(items)
             fq_items = get_price_on_flat_qube(items)
@@ -137,8 +136,8 @@ def compare_prices():
                 try:
                     result = (b_price / fq_price - 1) * 100
                 except ZeroDivisionError:
-                    continue
-                if result > target_procent:
+                    print("ERROR")
+                if result >= target_procent:
                     result_items = {
                         "market": "Binance",
                         "name": b_items["name"],
@@ -149,14 +148,13 @@ def compare_prices():
                         "different": f"{round(result, 2)}%"
                     }
                     send_message(result_items)
-                continue
 
             elif float(fq_price) > float(b_price):
                 try:
                     result = (fq_price / b_price - 1) * 100
                 except ZeroDivisionError:
-                    continue
-                if result > target_procent:
+                    print("ERROR")
+                if result >= target_procent:
                     result_items = {
                         "market": "FlatQube.io",
                         "name": b_items["name"],
