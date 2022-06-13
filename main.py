@@ -109,6 +109,8 @@ def compare_prices():
         for items in address_list:
             b_items = get_price_on_binance(items)
             fq_items = get_price_on_flat_qube(items)
+            if b_items['name'] == "ADA" or fq_items['name'] == "ADA":
+                target_procent = 7
             print()
             b_price = float(b_items['price'])
             fq_price = float(fq_items['price'])
