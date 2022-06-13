@@ -123,7 +123,6 @@ def compare_prices():
                 except ZeroDivisionError:
                     continue
                 print(f"Разница в процентах = {toFixed(result, 2)}%")
-
             elif fq_price > b_price:
                 print(f"Разница = {toFixed((fq_price - b_price), 5)} $")
                 try:
@@ -131,7 +130,10 @@ def compare_prices():
                 except ZeroDivisionError:
                     continue
                 print(f"Разница в процентах = {toFixed(result, 2)}%")
-            print()
+            dt = datetime.datetime.now()
+            dt_string = dt.strftime("Время: %H:%M:%S")
+
+            print(f"{dt_string}, TargetProcent: {target_procent}%")
 
             result = 0
             if float(b_price) > float(fq_price):
@@ -168,10 +170,7 @@ def compare_prices():
                     send_message(result_items)
                 continue
 
-        dt = datetime.datetime.now()
-        dt_string = dt.strftime("Время: %H:%M:%S")
 
-        print(f"{dt_string}, TargetProcent: {target_procent}%")
         time.sleep(60)
     except ConnectionError as e:
         print(e)
